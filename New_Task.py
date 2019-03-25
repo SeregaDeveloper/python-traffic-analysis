@@ -42,12 +42,13 @@ tcpupdate.to_csv('Output.csv')
 
 print('The most active pair was:')
 
-stats = pand.concat([filedf['Source'],filedf['Destination']],axis=1)
+stats = pand.concat([tcp['Source'],tcp['Destination']],axis=1)
 
 stats['uniq'] = stats['Source'] + ' ---> ' + stats['Destination']
 
 count = stats['uniq'].value_counts() [:1]
 
 print(count)
+
 
 # created by Sergey Besedin

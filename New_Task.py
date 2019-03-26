@@ -4,11 +4,17 @@ import pandas as pand
 
 file = pand.read_csv('in.csv',sep=',')
 
-print('Lets get it )')
+# make array witch contains all protocols we have
 
-print()
+protocols = []
 
-# select rows, which contains only TCP protocol data
+for x in file['Protocol']:
+
+    if x not in protocols:
+
+        protocols.append(str(x))
+
+print(protocols)
 
 filedf = pand.DataFrame(file)
 
@@ -16,39 +22,42 @@ filedf = pand.DataFrame(file)
 
 tcpgroup = filedf.groupby('Protocol')
 
-tcp = tcpgroup.get_group('TCP')
+# the main loop
 
-tcpupdate = pand.concat([tcp['Source'],tcp['Destination'],tcp['Source_port'],tcp['Dest_port']],axis=1)
+for y in protocols:
 
-print('TCP exchange stats')
+   tcp = tcpgroup.get_group(y)
 
-print(tcpupdate)
+   tcpupdate = pand.concat([tcp['Source'],tcp['Destination'],tcp['Source_port'],tcp['Dest_port']],axis=1)
 
-# print the TCP port stats
+   print(y + 'exchange stats')
 
-tcpupdate = pand.DataFrame(tcpupdate.groupby(['Source','Destination','Source_port','Dest_port'])['Source'].count())
+   print(tcpupdate)
 
-tcpupdate = tcpupdate.rename(columns = { 'Source' : 'Requests' })
+# find the port stats
+
+   tcpupdate = pand.DataFrame(tcpupdate.groupby(['Source','Destination','Source_port','Dest_port'])['Source'].count())
+
+   tcpupdate = tcpupdate.rename(columns = { 'Source' : 'Requests' })
 
 # output the portstats
 
-print('Port stats:')
+   print('Port stats:')
 
-print(tcpupdate)
+   print(tcpupdate)
 
-tcpupdate.to_csv('Output.csv')
+   tcpupdate.to_csv(y + 'Output.csv')
 
 # select most recent pair between them
 
-print('The most active pair was:')
+   print('The most active pair was:')
 
-stats = pand.concat([tcp['Source'],tcp['Destination']],axis=1)
+   stats = pand.concat([tcp['Source'],tcp['Destination']],axis=1)
 
-stats['uniq'] = stats['Source'] + ' ---> ' + stats['Destination']
+   stats['uniq'] = stats['Source'] + ' ---> ' + stats['Destination']
 
-count = stats['uniq'].value_counts() [:1]
+   count = stats['uniq'].value_counts() [:1]
 
-print(count)
-
+   print(count)
 
 # created by Sergey Besedin
